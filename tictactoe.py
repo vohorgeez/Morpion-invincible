@@ -52,4 +52,44 @@ def evaluate(board):
         return None
     
 def minimax(board, is_maximizing):
-    """à compléter"""
+    score = evaluate(board)
+    if score is not None:
+        return score
+    legal_moves = get_legal_moves(board)
+    if is_maximizing:
+        best_score = -999
+        for move in legal_moves:
+            board[move] = "X"
+            score=minimax(board, False)
+            board[move] = " "
+            if score > best_score:
+                best_score = score
+    else:
+        best_score = 999
+        for move in legal_moves:
+            board[move] = "O"
+            score=minimax(board, True)
+            board[move] = " "
+            if score < best_score:
+                best_score = score
+    return best_score
+
+def choose_best_move(board):
+    legal_moves=get_legal_moves(board)
+    best_move = legal_moves[0]
+    best_score = -999
+    inspection = 0
+    for move in legal_moves:
+        board[move] = "X"
+        inspection=minimax(board, False)
+        board[move] = " "
+        if inspection > best_score:
+            best_move = move
+            best_score = inspection
+    return best_move
+
+def play_game():
+    board=create_board()
+    while True:
+        print_board(board)
+        """à compléter"""
