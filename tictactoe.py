@@ -6,7 +6,7 @@ def print_board(board):
         start=3*i
         print(board[start], " | ", board[start+1], " | ", board[start+2])
         if i<2:
-            print("-----------")
+            print("---------------")
 
 WIN_LINES = [
     (0,1,2), (3,4,5), (6,7,8), #lignes
@@ -88,8 +88,38 @@ def choose_best_move(board):
             best_score = inspection
     return best_move
 
+def human_turn(board):
+    print_board(board)
+    has_played=False
+    while not has_played:
+        raw = input("Veuillez entrer un entier entre 0 et 8, correspondant à la case que vous souhaitez investir.")
+        try:
+            move = int(raw)
+        except ValueError:
+            print("Ce coup est incompréhensible.")
+            continue
+        legal_moves = get_legal_moves(board)
+        if move in legal_moves:
+            board[move] = "O"
+            has_played=True
+        else:
+            print("Ce coup est impossible.")
+
 def play_game():
-    board=create_board()
-    while True:
-        print_board(board)
-        """à compléter"""
+    board = create_board()
+    while get_winner(board) is None:
+        human_turn(board)
+        winner = get_winner(board)
+        if winner is not None:
+            break
+        best_move = choose_best_move(board)
+        board[best_move] = "X"
+    print_board(board)
+    winner=get_winner(board)
+    if winner == "draw":
+        print("Match nul !")
+    else:
+        print(f"{winner} a gagné !")
+
+if __name__ == "__main__":
+    play_game()
