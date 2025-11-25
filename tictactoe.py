@@ -51,16 +51,20 @@ def evaluate(board):
     else:
         return None
     
-def minimax(board, is_maximizing):
+def minimax(board, is_maximizing, depth=0):
     score = evaluate(board)
-    if score is not None:
+    if score == 1:
+        return score * 10 - depth
+    elif score == -1:
+        return score * 10 + depth
+    elif score == 0:
         return score
     legal_moves = get_legal_moves(board)
     if is_maximizing:
         best_score = -999
         for move in legal_moves:
             board[move] = "X"
-            score=minimax(board, False)
+            score=minimax(board, False, depth + 1)
             board[move] = " "
             if score > best_score:
                 best_score = score
@@ -68,7 +72,7 @@ def minimax(board, is_maximizing):
         best_score = 999
         for move in legal_moves:
             board[move] = "O"
-            score=minimax(board, True)
+            score=minimax(board, True, depth +1)
             board[move] = " "
             if score < best_score:
                 best_score = score
