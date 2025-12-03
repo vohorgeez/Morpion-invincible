@@ -19,13 +19,6 @@ def get_node_counter():
 def create_board():
     return [" "]*9
 
-def print_board(board):
-    for i in range (3):
-        start=3*i
-        print(board[start], " | ", board[start+1], " | ", board[start+2])
-        if i<2:
-            print("---------------")
-
 def has_won(board, player):
     for a, b, c in WIN_LINES:
         if board[a] == board[b] == board[c] == player:
@@ -131,72 +124,23 @@ def choose_best_move(board):
             best_move = move
     return best_move
 
-# --- Interface CLI ---
+# --- Petite API pratique ---
 
-def human_turn(board):
-    print_board(board)
-    has_played=False
-    while not has_played:
-        raw = input("Veuillez entrer un entier entre 0 et 8, correspondant à la case que vous souhaitez investir.")
-        try:
-            move = int(raw)
-        except ValueError:
-            print("Ce coup est incompréhensible.")
-            continue
-        if not 0 <= move <= 8:
-            print("Ce coup est hors du plateau (les indices vont de 0 à 8).")
-            continue
-        legal_moves = get_legal_moves(board)
-        if move in legal_moves:
-            board[move] = "O"
-            has_played=True
-        else:
-            print("Ce coup est impossible.")
-
-def ask_who_starts():
+def apply_move(board, index, player):
     """
-    Demande qui commence la partie.
-    Retourne True si l'IA commence, False si le joueur commence.
+    Retourne un nouveau plateau après avoir joué 'player' en 'index'.
+    Ne modifie pas le plateau d'origine.
     """
-    while True:
-        print("Qui commence ?")
-        print("    1 - Vous (O)")
-        print("    2 - IA (X)")
-        choice = input("Votre choix (1 ou 2, défaut = 1) : ").strip()
-        if choice == "" or choice == "1":
-            return False
-        if choice == "2":
-            return True
-        print("Entrée invalide. Merci de choisir 1 ou 2.")
+    new_board = board.copy()
+    new_board[index] = player
+    return new_board
 
-def play_game():
-    board = create_board()
-    ai_starts = ask_who_starts()
-    
-    if ai_starts:
-        # Premier coup de l'IA
-        best_move = choose_best_move(board)
-        board[best_move] = "X"
-        print(f"[IA] joue en {best_move}")
-        print(f"[IA] Noeuds explorés : {get_node_counter()}")
-
-    while get_winner(board) is None:
-        human_turn(board)
-        winner = get_winner(board)
-        if winner is not None:
-            break
-
-        best_move = choose_best_move(board)
-        board[best_move] = "X"
-        print(f"[IA] joue en {best_move}")
-        print(f"[IA] Noeuds explorés : {get_node_counter()}")
-
-    print_board(board)
-    winner = get_winner(board)
-    if winner == "draw":
-        print("Match nul !")
-    else:
-        print(f"{winner} a gagné !")
-
-if __name__ == "__main__":
-    play_game()
+def make_ai_move(board):
+    """
+    Joue le meilleur coup pour X sur 'board'.
+    Retourne (nouveau_plateau, coup_joué, noeuds_explorés).
+    """
+    move = choose_best_move(board)
+    nodes = get_node_counter()
+    new_board = apply_move(board, move, "X")
+    return new_board, move, nodes

@@ -1,6 +1,6 @@
 import unittest
 
-from tictactoe import (
+from engine import (
     create_board,
     has_won,
     get_winner,
