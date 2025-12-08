@@ -41,6 +41,16 @@ def get_winner(board):
 def get_legal_moves(board):
     return [i for i, cell in enumerate(board) if cell == " "]
 
+def get_winning_line(board):
+    """
+    Retourne un tuple (a, b, c) représentant la ligne gagnante,
+    ou None s'il n'y en a pas.
+    """
+    for a, b, c in WIN_LINES:
+        if board[a] == board[b] == board[c] != " ":
+            return (a, b, c)
+    return None
+
 # --- Evaluation zéro-heuristique (positions terminales uniquement) ---
 
 def evaluate_terminal(board):
