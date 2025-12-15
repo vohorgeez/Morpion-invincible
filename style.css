@@ -1,0 +1,29 @@
+* { box-sizing: border-box;}
+body { font-family: system-ui, sans-serif; margin: 0; padding: 24px; display: grid; place-items: start center; }
+.app { width: min(520px, 100%); display: grid; gap: 16px; }
+.controls { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.status { padding: 10px 12px; border: 1px solid #ddd; border-radius: 10px; background: #fafafa; }
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(3, 110px);
+    grid-template-rows: repeat(3, 110px);
+    gap: 10px;
+}
+
+.cell {
+    font-size: 44px;
+    border: 1px solid #ddd;
+    border-radius: 16px;
+    background: white;
+    cursor: pointer;
+}
+
+.cell:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.cell.win {
+    outline: 4px solid #111; /* ligne gagnante */
+}

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Morpion Invincible</title>
+        <link rel="stylesheet" href="style.css" />
+    </head>
+    <body>
+        <main class="app">
+            <h1>Morpion Invincible</h1>
+
+            <div class="controls">
+                <label>
+                    Difficulté
+                    <select id="mode">
+                        <option value="easy">Facile (aléatoire)</option>
+                        <option value="perfect" selected>Parfait (minimax)</option>
+                    </select>
+                </label>
+
+                <button id="reset">Reset</button>
+                <div class="stats">
+                    <span>Temps IA: <strong id="aiTime">-</strong> ms</span>
+                </div>
+            </div>
+
+            <div id="status" class="status">A toi de jouer (O).</div>
+
+            <div id="grid" class="grid" aria-label="grille morpion">
+                <!-- 9 cases injectées par JS-->
+            </div>
+        </main>
+
+        <script src="script.js"></script>
+    </body>
+</html>

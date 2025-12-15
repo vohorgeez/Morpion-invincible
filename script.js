@@ -93,9 +93,49 @@ function chooseBestMove(board) {
 }
 
 function getRandomMove(board) {
-    // ...
+    const legal_moves = getLegalMoves(board);
+    return legal_moves[Math.floor(Math.random() * legal_moves.length)];
 }
 
 function getAiMove(board, mode) {
-    // ...
+    if (mode == "easy") {
+        return getRandomMove(board);
+    } else {
+        return chooseBestMove(board);
+    }
+}
+
+// ===== UI / GAME STATE =====
+const HUMAN = "O";
+const AI = "X";
+
+let board = createBoard();
+let mode = "perfect";
+let gameOver = false;
+let aiThinking = false;
+
+const gridEl = document.getElementById("grid");
+const statusEl = document.getElementById("status");
+const modeEl = document.getElementById("mode");
+const resetEl = document.getElementById("reset");
+const aiTimeEl = document.getElementById("aiTime");
+
+// Construire les 9 cases (boutons)
+function initGrid() {
+    gridEl.innerHTML = "";
+    for (let i = 0; i < 9; i++) {
+        const btn = document.createElement("button");
+        btn.className = "cell";
+        btn.dataset.index = String(i);
+        btn.addEventListener("click", onCellClick);
+        gridEl.appendChild(btn);
+    }
+}
+
+function setStatus(text) {
+    statusEl.textContent = text;
+}
+
+function clearWinHighLight() {
+    for (const el of gridEl.children) el.classList.remove("win");
 }
