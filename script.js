@@ -139,3 +139,32 @@ function setStatus(text) {
 function clearWinHighLight() {
     for (const el of gridEl.children) el.classList.remove("win");
 }
+
+function getWinningLine(board) {
+    for (const [a, b, c] of WIN_LINES) {
+        if (board[a] !== " " && board[a] === board[b] && board[b] === board[c]) {
+            return [a, b, c];
+        }
+    }
+    return null;
+}
+
+function render() {
+    const cells = gridEl.children;
+    for (let i = 0; i < 9; i++) {
+        cells[i].textContent = board[i] === " " ? "" : board[i];
+        cells[i].disabled = gameOver || aiThinking || board[i] !== " ";
+    }
+}
+
+function endGame(winner) {
+    gameOver = true;
+
+    const line = getWinningLine(board);
+    if (line) {
+        for (const idx of line) gridEl.children[idx].classList.add("win");
+    }
+
+    if (winner === "draw") setStatus("Match nul. Humanité : 0, logique : 0.");
+    else setStatus(`${winner} gagne.`);
+}
