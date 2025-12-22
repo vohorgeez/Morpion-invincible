@@ -47,9 +47,6 @@ function applyMove(board, index, player) {
     return new_board;
 }
 
-let nodesVisited = 0;
-const aiNodesEl = document.getElementById("aiNodes");
-
 function minimax(board, player, alpha, beta) {
     nodesVisited++;
     const winner = getWinner(board);
@@ -127,6 +124,16 @@ const statusEl = document.getElementById("status");
 const modeEl = document.getElementById("mode");
 const resetEl = document.getElementById("reset");
 const aiTimeEl = document.getElementById("aiTime");
+
+let nodesVisited = 0;
+const aiNodesEl = document.getElementById("aiNodes");
+
+let startingPlayer = "O"; // "O" ou "X"
+const starterEl = document.getElementById("starter");
+starterEl.addEventListener("change", () => {
+    startingPlayer = starterEl.value;
+    resetGame();
+});
 
 // Construire les 9 cases (boutons)
 function initGrid() {
@@ -233,11 +240,18 @@ function resetGame() {
     board = createBoard();
     gameOver = false;
     aiThinking = false;
+    nodesVisited = 0;
     aiTimeEl.textContent = "-";
     aiNodesEl.textContent = "-";
     clearWinHighLight();
-    setStatus("A toi de jouer (O).");
     render();
+
+    if (startingPlayer === "X") {
+        setStatus("L'IA commence...");
+        aiTurn();
+    } else {
+        setStatus("A toi de jouer (O).");
+    }
 }
 
 // Events UI
