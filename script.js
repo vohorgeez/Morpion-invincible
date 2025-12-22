@@ -168,3 +168,74 @@ function endGame(winner) {
     if (winner === "draw") setStatus("Match nul. Humanité : 0, logique : 0.");
     else setStatus(`${winner} gagne.`);
 }
+
+function checkGameState() {
+    const w = getWinner(board);
+    if (w === null) return null;
+    endGame(w);
+    return w;
+}
+
+function onCellClick(e) {
+    if (gameOver || aiThinking) return;
+
+    const idx = Number(e.currentTarget.dataset.index);
+    if (board[idx] !== " ") return;
+
+    clearWinHighLight();
+
+    //Coup humain
+    board = applyMove(board, idx, HUMAN);
+    render();
+
+    if (checkGameState()) return;
+
+    //Tour IA avec micro-délai
+    aiTurn();
+}
+
+function aiTurn() {
+    aiThinking = true;
+    setStatus("L'IA réfléchit...");
+    render();
+
+    const delayMs = 120; // micro délai UX
+
+    setTimeout(() => {
+        const t0 = performance.now();
+        const move = getAiMove(board, mode);
+        const t1 = performance.now();
+
+        aiTimeEl.textContent = (t1 - t0).toFixed(2);
+
+        board = applyMove(board, move, AI);
+
+        aiThinking = false;
+        render();
+
+        if (!checkGameState()) {
+            setStatus("A toi de jouer (O).");
+        }
+    }, delayMs);
+}
+
+function resetGame() {
+    board = createBoard();
+    gameOver = false;
+    aiThinking = false;
+    aiTimeEl.textContent = "-";
+    clearWinHighLight();
+    setStatus("A toi de jouer (O).");
+    render();
+}
+
+// Events UI
+modeEl.addEventListener("change", () => {
+    mode = modeEl.value;
+});
+
+resetEl.addEventListener("click", resetGame);
+
+// Boot
+initGrid();
+resetGame();
