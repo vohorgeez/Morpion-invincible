@@ -50,7 +50,7 @@ function applyMove(board, index, player) {
 let nodesVisited = 0;
 const aiNodesEl = document.getElementById("aiNodes");
 
-function minimax(board, player) {
+function minimax(board, player, alpha, beta) {
     nodesVisited++;
     const winner = getWinner(board);
     if (winner === "X") {
@@ -65,8 +65,10 @@ function minimax(board, player) {
         const moves = getLegalMoves(board);
         for (let i = 0; i < moves.length; i++) {
             let new_board = applyMove(board, moves[i], player);
-            let score = minimax(new_board, "O");
+            let score = minimax(new_board, "O", alpha, beta);
             bestScore = Math.max(score, bestScore);
+            alpha = Math.max(alpha, bestScore);
+            if (alpha >= beta) break;
         }
         return bestScore;
     } else if (player === "O") {
@@ -74,8 +76,10 @@ function minimax(board, player) {
         const moves = getLegalMoves(board);
         for (let i = 0; i < moves.length; i++) {
             let new_board = applyMove(board, moves[i], player);
-            let score = minimax(new_board, "X");
+            let score = minimax(new_board, "X", alpha, beta);
             bestScore = Math.min(score, bestScore);
+            beta = Math.min(beta, bestScore);
+            if (alpha >= beta) break;
         }
         return bestScore;
         }
@@ -87,7 +91,7 @@ function chooseBestMove(board) {
     const moves = getLegalMoves(board);
     for (let i = 0; i < moves.length; i++) {
         let new_board = applyMove(board, moves[i], "X");
-        let score = minimax(new_board, "O");
+        let score = minimax(new_board, "O", -Infinity, Infinity);
         if (score > bestScore) {
             bestScore = score;
             bestMove = moves[i];
