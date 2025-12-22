@@ -47,7 +47,11 @@ function applyMove(board, index, player) {
     return new_board;
 }
 
+let nodesVisited = 0;
+const aiNodesEl = document.getElementById("aiNodes");
+
 function minimax(board, player) {
+    nodesVisited++;
     const winner = getWinner(board);
     if (winner === "X") {
         return 1;
@@ -206,6 +210,8 @@ function aiTurn() {
         const move = getAiMove(board, mode);
         const t1 = performance.now();
 
+        aiNodesEl.textContent = String(nodesVisited);
+
         aiTimeEl.textContent = (t1 - t0).toFixed(2);
 
         board = applyMove(board, move, AI);
@@ -224,6 +230,7 @@ function resetGame() {
     gameOver = false;
     aiThinking = false;
     aiTimeEl.textContent = "-";
+    aiNodesEl.textContent = "-";
     clearWinHighLight();
     setStatus("A toi de jouer (O).");
     render();
