@@ -135,6 +135,21 @@ starterEl.addEventListener("change", () => {
     resetGame();
 });
 
+const themeToggleEl = document.getElementById("themeToggle");
+
+function setTheme(theme) {
+    document.documentElement.dataset.theme = theme;
+    localStorage.setItem("theme", theme);
+}
+
+const savedTheme = localStorage.getItem("theme") || "light";
+setTheme(savedTheme);
+themeToggleEl.checked = savedTheme === "dark";
+
+themeToggleEl.addEventListener("change", () => {
+    setTheme(themeToggleEl.checked ? "dark" : "light");
+});
+
 // Construire les 9 cases (boutons)
 function initGrid() {
     gridEl.innerHTML = "";
