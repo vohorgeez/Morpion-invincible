@@ -1,3 +1,12 @@
+@font-face {
+    font-family: "Vividly";
+    src: url(".assets/fonts/Vividly-Regular.ttf") format("truetype"),
+    url("./assets/fonts/Vividly-Regular.otf") format("opentype");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
 * { box-sizing: border-box;}
 .app { width: min(520px, 100%); display: grid; gap: 16px; }
 .controls { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
@@ -52,7 +61,10 @@ body {
 }
 
 .cell {
-    font-size: 44px;
+    font-family: "Vividly", system-ui, sans-serif;
+    font-size: 56px;
+    line-height: 1;
+    letter-spacing: 0.5px;
     border: 1px solid var(--border);
     border-radius: 16px;
     background: var(--cell-bg);
