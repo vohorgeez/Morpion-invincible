@@ -73,7 +73,7 @@ def evaluate_terminal(board):
     
 # --- Minimax avec élagage alpha-beta ---
     
-def minimax_ab(board, is_maximizing, alpha, beta, depth=0):
+def minimax_ab(board, is_maximizing, alpha, beta):
     """
     Minimax exhaustif avec élagage alpha-beta.
     Pas d'heuristique : on ne note que les positions terminales.
@@ -91,7 +91,7 @@ def minimax_ab(board, is_maximizing, alpha, beta, depth=0):
         value = float("-inf")
         for move in legal_moves:
             board[move] = "X"
-            value = max(value, minimax_ab(board, False, alpha, beta, depth+1))
+            value = max(value, minimax_ab(board, False, alpha, beta))
             board[move] = " "
             alpha = max(alpha, value)
             if beta <= alpha:
@@ -101,7 +101,7 @@ def minimax_ab(board, is_maximizing, alpha, beta, depth=0):
         value = float("inf")
         for move in legal_moves:
             board[move] = "O"
-            value = min(value, minimax_ab(board, True, alpha, beta, depth+1))
+            value = min(value, minimax_ab(board, True, alpha, beta))
             board[move] = " "
             beta = min(beta, value)
             if beta <= alpha:
@@ -127,7 +127,7 @@ def choose_best_move(board):
 
     for move in legal_moves:
         board[move] = "X"
-        score = minimax_ab(board, False, float("-inf"), float("inf"), depth=1)
+        score = minimax_ab(board, False, float("-inf"), float("inf"))
         board[move] = " "
         if score > best_score:
             best_score = score

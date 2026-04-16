@@ -103,6 +103,7 @@ function getRandomMove(board) {
 }
 
 function getAiMove(board, mode) {
+    nodesVisited = 0;
     if (mode == "easy") {
         return getRandomMove(board);
     } else {
