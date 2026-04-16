@@ -38,7 +38,7 @@ def get_winner(board):
     else:
         return None
 
-def get_legal_moves(board):
+def get_available_moves(board):
     return [i for i, cell in enumerate(board) if cell == " "]
 
 def get_winning_line(board):
@@ -51,9 +51,12 @@ def get_winning_line(board):
             return (a, b, c)
     return None
 
+def is_terminal(board):
+    return get_winner(board) is not None
+
 # --- Evaluation zéro-heuristique (positions terminales uniquement) ---
 
-def evaluate_terminal(board):
+def evaluate(board):
     """
     Retourne :
     1 si X gagne
@@ -81,11 +84,10 @@ def minimax_ab(board, is_maximizing, alpha, beta):
     global NODES_VISITED
     NODES_VISITED += 1
 
-    score = evaluate_terminal(board)
-    if score is not None:
-        return score
+    if is_terminal(board):
+        return evaluate(board)
     
-    legal_moves = get_legal_moves(board)
+    legal_moves = get_available_moves(board)
 
     if is_maximizing:
         value = float("-inf")
@@ -112,7 +114,7 @@ def minimax_ab(board, is_maximizing, alpha, beta):
 PREFERRED_ORDER = [4, 0, 2, 6, 8, 1, 3, 5, 7]
 
 def ordered_legal_moves(board):
-    legal = set(get_legal_moves(board))
+    legal = set(get_available_moves(board))
     return [m for m in PREFERRED_ORDER if m in legal]
 
 def choose_best_move(board):

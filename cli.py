@@ -1,7 +1,7 @@
 from engine import (
     create_board,
     get_winner,
-    get_legal_moves,
+    get_available_moves,
     make_ai_move
 )
 
@@ -25,7 +25,7 @@ def human_turn(board):
         if not 0 <= move <= 8:
             print("Ce coup est hors du plateau (les indices vont de 0 à 8).")
             continue
-        legal_moves = get_legal_moves(board)
+        legal_moves = get_available_moves(board)
         if move in legal_moves:
             board[move] = "O"
             has_played=True
