@@ -4,32 +4,36 @@ const WIN_LINES = [
     [0, 4, 8], [2, 4, 6]
 ];
 
+const HUMAN = "O";
+const AI = "X";
+const EMPTY = " ";
+
 function createBoard() {
-    return Array(9).fill(" ");
+    return Array(9).fill(EMPTY);
 }
 
 // getLegalMoves(board) -> array d'indices vides
 function getLegalMoves(board) {
     var legal_moves = [];
     for (var i = 0; i < board.length; i++) {
-        if (board[i] === " ") {
+        if (board[i] === EMPTY) {
             legal_moves.push(i);
         }
     }
     return legal_moves;
 }
 
-// getWinner(board) -> "X" / "O" / "draw" / null
+// getWinner(board) -> AI / HUMAN / "draw" / null
 function getWinner(board) {
     for (var i = 0; i < WIN_LINES.length; i++) {
         var a = WIN_LINES[i][0];
         var b = WIN_LINES[i][1];
         var c = WIN_LINES[i][2];
-        if (board[a] === board[b] && board[b] === board[c] && board[a] !== " ") {
-            if (board[a] === "X") {
-                return "X";
-            } else if (board[a] === "O") {
-                return "O";
+        if (board[a] === board[b] && board[b] === board[c] && board[a] !== EMPTY) {
+            if (board[a] === AI) {
+                return AI;
+            } else if (board[a] === HUMAN) {
+                return HUMAN;
             }
         }
     }
@@ -50,30 +54,30 @@ function applyMove(board, index, player) {
 function minimax(board, player, alpha, beta) {
     nodesVisited++;
     const winner = getWinner(board);
-    if (winner === "X") {
+    if (winner === AI) {
         return 1;
-    } else if (winner === "O") {
+    } else if (winner === HUMAN) {
         return -1;
     } else if (winner === "draw") {
         return 0;
     }
-    if (player === "X") {
+    if (player === AI) {
         let bestScore = -Infinity;
         const moves = getLegalMoves(board);
         for (let i = 0; i < moves.length; i++) {
             let new_board = applyMove(board, moves[i], player);
-            let score = minimax(new_board, "O", alpha, beta);
+            let score = minimax(new_board, HUMAN, alpha, beta);
             bestScore = Math.max(score, bestScore);
             alpha = Math.max(alpha, bestScore);
             if (alpha >= beta) break;
         }
         return bestScore;
-    } else if (player === "O") {
+    } else if (player === HUMAN) {
         let bestScore = Infinity;
         const moves = getLegalMoves(board);
         for (let i = 0; i < moves.length; i++) {
             let new_board = applyMove(board, moves[i], player);
-            let score = minimax(new_board, "X", alpha, beta);
+            let score = minimax(new_board, AI, alpha, beta);
             bestScore = Math.min(score, bestScore);
             beta = Math.min(beta, bestScore);
             if (alpha >= beta) break;
@@ -87,8 +91,8 @@ function chooseBestMove(board) {
     let bestMove;
     const moves = getLegalMoves(board);
     for (let i = 0; i < moves.length; i++) {
-        let new_board = applyMove(board, moves[i], "X");
-        let score = minimax(new_board, "O", -Infinity, Infinity);
+        let new_board = applyMove(board, moves[i], AI);
+        let score = minimax(new_board, HUMAN, -Infinity, Infinity);
         if (score > bestScore) {
             bestScore = score;
             bestMove = moves[i];
@@ -112,9 +116,6 @@ function getAiMove(board, mode) {
 }
 
 // ===== UI / GAME STATE =====
-const HUMAN = "O";
-const AI = "X";
-
 let board = createBoard();
 let mode = "perfect";
 let gameOver = false;
@@ -129,7 +130,7 @@ const aiTimeEl = document.getElementById("aiTime");
 let nodesVisited = 0;
 const aiNodesEl = document.getElementById("aiNodes");
 
-let startingPlayer = "O"; // "O" ou "X"
+let startingPlayer = HUMAN; // HUMAN ou AI
 const starterEl = document.getElementById("starter");
 starterEl.addEventListener("change", () => {
     startingPlayer = starterEl.value;
@@ -173,7 +174,7 @@ function clearWinHighLight() {
 
 function getWinningLine(board) {
     for (const [a, b, c] of WIN_LINES) {
-        if (board[a] !== " " && board[a] === board[b] && board[b] === board[c]) {
+        if (board[a] !== EMPTY && board[a] === board[b] && board[b] === board[c]) {
             return [a, b, c];
         }
     }
@@ -183,8 +184,8 @@ function getWinningLine(board) {
 function render() {
     const cells = gridEl.children;
     for (let i = 0; i < 9; i++) {
-        cells[i].textContent = board[i] === " " ? "" : board[i];
-        cells[i].disabled = gameOver || aiThinking || board[i] !== " ";
+        cells[i].textContent = board[i] === EMPTY ? "" : board[i];
+        cells[i].disabled = gameOver || aiThinking || board[i] !== EMPTY;
     }
 }
 
@@ -211,7 +212,7 @@ function onCellClick(e) {
     if (gameOver || aiThinking) return;
 
     const idx = Number(e.currentTarget.dataset.index);
-    if (board[idx] !== " ") return;
+    if (board[idx] !== EMPTY) return;
 
     clearWinHighLight();
 
@@ -247,7 +248,7 @@ function aiTurn() {
         render();
 
         if (!checkGameState()) {
-            setStatus("A toi de jouer (O).");
+            setStatus(`A toi de jouer (${HUMAN}).`);
         }
     }, delayMs);
 }
@@ -262,11 +263,11 @@ function resetGame() {
     clearWinHighLight();
     render();
 
-    if (startingPlayer === "X") {
+    if (startingPlayer === AI) {
         setStatus("L'IA commence...");
         aiTurn();
     } else {
-        setStatus("A toi de jouer (O).");
+        setStatus(`A toi de jouer (${HUMAN}).`);
     }
 }
 

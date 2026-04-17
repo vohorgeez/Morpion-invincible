@@ -4,6 +4,10 @@ WIN_LINES = [
     (0,4,8), (2,4,6) #diagonales
 ]
 
+HUMAN = "O"
+AI = "X"
+EMPTY = " "
+
 # --- Compteur de noeuds pour le minimax ---
 NODES_VISITED = 0
 
@@ -17,7 +21,7 @@ def get_node_counter():
 # --- Moteur de jeu de base ---
 
 def create_board():
-    return [" "]*9
+    return [EMPTY]*9
 
 def has_won(board, player):
     for a, b, c in WIN_LINES:
@@ -26,20 +30,23 @@ def has_won(board, player):
     return False
 
 def is_full(board):
-    return " " not in board
+    return EMPTY not in board
     
 def get_winner(board):
-    if has_won(board, "X"):
-        return "X"
-    elif has_won(board, "O"):
-        return "O"
+    if has_won(board, AI):
+        return AI
+    elif has_won(board, HUMAN):
+        return HUMAN
     elif is_full(board):
         return "draw"
     else:
         return None
 
 def get_available_moves(board):
-    return [i for i, cell in enumerate(board) if cell == " "]
+    return [i for i, cell in enumerate(board) if cell == EMPTY]
+
+def is_valid_move(board, index):
+    return board[index] == EMPTY
 
 def get_winning_line(board):
     """
@@ -47,7 +54,7 @@ def get_winning_line(board):
     ou None s'il n'y en a pas.
     """
     for a, b, c in WIN_LINES:
-        if board[a] == board[b] == board[c] != " ":
+        if board[a] == board[b] == board[c] != EMPTY:
             return (a, b, c)
     return None
 
@@ -59,15 +66,15 @@ def is_terminal(board):
 def evaluate(board):
     """
     Retourne :
-    1 si X gagne
-    -1 si O gagne
+    1 si AI gagne
+    -1 si HUMAN gagne
     0 si match nul
     None si la position n'est pas terminale
     """
     winner = get_winner(board)
-    if winner == "X":
+    if winner == AI:
         return 1
-    elif winner == "O":
+    elif winner == HUMAN:
         return -1
     elif winner == "draw":
         return 0
@@ -92,9 +99,9 @@ def minimax_ab(board, is_maximizing, alpha, beta):
     if is_maximizing:
         value = float("-inf")
         for move in legal_moves:
-            board[move] = "X"
+            board[move] = AI
             value = max(value, minimax_ab(board, False, alpha, beta))
-            board[move] = " "
+            board[move] = EMPTY
             alpha = max(alpha, value)
             if beta <= alpha:
                 break # élagage
@@ -102,9 +109,9 @@ def minimax_ab(board, is_maximizing, alpha, beta):
     else:
         value = float("inf")
         for move in legal_moves:
-            board[move] = "O"
+            board[move] = HUMAN
             value = min(value, minimax_ab(board, True, alpha, beta))
-            board[move] = " "
+            board[move] = EMPTY
             beta = min(beta, value)
             if beta <= alpha:
                 break # élagage
@@ -128,9 +135,9 @@ def choose_best_move(board):
     best_score = float("-inf")
 
     for move in legal_moves:
-        board[move] = "X"
+        board[move] = AI
         score = minimax_ab(board, False, float("-inf"), float("inf"))
-        board[move] = " "
+        board[move] = EMPTY
         if score > best_score:
             best_score = score
             best_move = move
@@ -154,5 +161,5 @@ def make_ai_move(board):
     """
     move = choose_best_move(board)
     nodes = get_node_counter()
-    new_board = apply_move(board, move, "X")
+    new_board = apply_move(board, move, AI)
     return new_board, move, nodes
