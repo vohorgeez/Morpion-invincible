@@ -135,12 +135,15 @@ def choose_best_move(board):
     best_score = float("-inf")
 
     for move in legal_moves:
+        print(f"Coup analysé : {move}")
         board[move] = AI
         score = minimax_ab(board, False, float("-inf"), float("inf"))
         board[move] = EMPTY
+        print(f"Score du coup {move} : {score}")
         if score > best_score:
             best_score = score
             best_move = move
+    print(f"Meilleur coup trouvé : {best_move} (score = {best_score})")
     return best_move
 
 # --- Petite API pratique ---
