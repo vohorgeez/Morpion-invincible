@@ -94,7 +94,7 @@ def minimax_ab(board, is_maximizing, alpha, beta):
     if is_terminal(board):
         return evaluate(board)
     
-    legal_moves = get_available_moves(board)
+    legal_moves = ordered_legal_moves(board)
 
     if is_maximizing:
         value = float("-inf")
