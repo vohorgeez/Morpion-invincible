@@ -103,7 +103,7 @@ def minimax_ab(board, is_maximizing, alpha, beta):
             value = max(value, minimax_ab(board, False, alpha, beta))
             board[move] = EMPTY
             alpha = max(alpha, value)
-            if beta <= alpha:
+            if beta <= alpha: # le maximiseur a déjà mieux ailleurs : inutile d'explorer cette branche
                 break # élagage
         return value
     else:
@@ -113,7 +113,7 @@ def minimax_ab(board, is_maximizing, alpha, beta):
             value = min(value, minimax_ab(board, True, alpha, beta))
             board[move] = EMPTY
             beta = min(beta, value)
-            if beta <= alpha:
+            if beta <= alpha: # le minimiseur a déjà mieux ailleurs : inutile d'explorer cette branche
                 break # élagage
         return value
     

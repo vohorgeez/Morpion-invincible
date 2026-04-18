@@ -3,7 +3,8 @@ from engine import (
     get_winner,
     make_ai_move,
     is_valid_move,
-    HUMAN
+    HUMAN,
+    get_available_moves
 )
 
 def print_board(board):
