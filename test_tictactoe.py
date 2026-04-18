@@ -9,6 +9,7 @@ from engine import (
     choose_best_move,
     reset_node_counter,
     get_node_counter,
+    is_valid_move
 )
 
 class TestTicTacToe(unittest.TestCase):
@@ -67,6 +68,15 @@ class TestTicTacToe(unittest.TestCase):
         reset_node_counter()
         _ = choose_best_move(board)
         self.assertGreater(get_node_counter(), 0)
+
+    def test_a_valid_move(self):
+        board = create_board()
+        self.assertTrue(is_valid_move(board, 0))
+
+    def test_an_invalid_move(self):
+        board = create_board()
+        board[0] = "X"
+        self.assertFalse(is_valid_move(board, 0))
 
 if __name__ == "__main__":
     unittest.main()
