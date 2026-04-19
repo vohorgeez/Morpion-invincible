@@ -81,6 +81,36 @@ def evaluate(board):
     else:
         return None 
     
+# --- Minimax pur ---
+
+def minimax_pure(board, is_maximizing):
+    """
+    Minimax exhaustif SANS élagage alpha-beta.
+    Utilisé uniquement pour comparer les performances avec minimax_ab.
+    """
+    global NODES_VISITED
+    NODES_VISITED += 1
+
+    if is_terminal(board):
+        return evaluate(board)
+    
+    legal_moves = get_available_moves(board) # pas d'ordering : comparaison équitable
+
+    if is_maximizing:
+        value = float("-inf")
+        for move in legal_moves:
+            board[move] = AI
+            value = max(value, minimax_pure(board, False))
+            board[move] = EMPTY
+        return value
+    else:
+        value = float("inf")
+        for move in legal_moves:
+            board[move] = HUMAN
+            value = min(value, minimax_pure(board, True))
+            board[move] = EMPTY
+        return value
+
 # --- Minimax avec élagage alpha-beta ---
     
 def minimax_ab(board, is_maximizing, alpha, beta):
@@ -135,7 +165,7 @@ def choose_best_move(board):
     best_score = float("-inf")
 
     for move in legal_moves:
-        print(f"Coup analysé : {move}")
+        #print(f"Coup analysé : {move}")
         board[move] = AI
         score = minimax_ab(board, False, float("-inf"), float("inf"))
         board[move] = EMPTY
@@ -143,7 +173,7 @@ def choose_best_move(board):
         if score > best_score:
             best_score = score
             best_move = move
-    print(f"Meilleur coup trouvé : {best_move} (score = {best_score})")
+    #print(f"Meilleur coup trouvé : {best_move} (score = {best_score})")
     return best_move
 
 # --- Petite API pratique ---
