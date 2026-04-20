@@ -7,6 +7,7 @@ const WIN_LINES = [
 const HUMAN = "O";
 const AI = "X";
 const EMPTY = " ";
+const PREFERRED_ORDER = [4, 0, 2, 6, 8, 1, 3, 5, 7];
 
 function createBoard() {
     return Array(9).fill(EMPTY);
@@ -14,13 +15,7 @@ function createBoard() {
 
 // getLegalMoves(board) -> array d'indices vides
 function getLegalMoves(board) {
-    var legal_moves = [];
-    for (var i = 0; i < board.length; i++) {
-        if (board[i] === EMPTY) {
-            legal_moves.push(i);
-        }
-    }
-    return legal_moves;
+    return PREFERRED_ORDER.filter(i => board[i] === EMPTY);
 }
 
 // getWinner(board) -> AI / HUMAN / "draw" / null
