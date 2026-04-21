@@ -5,134 +5,107 @@ const WIN_LINES = [
 ];
 
 const HUMAN = "O";
-const AI = "X";
+const AI    = "X";
 const EMPTY = " ";
 const PREFERRED_ORDER = [4, 0, 2, 6, 8, 1, 3, 5, 7];
+
+// ── Logique pure ──────────────────────────────────────────────
 
 function createBoard() {
     return Array(9).fill(EMPTY);
 }
 
-// getLegalMoves(board) -> array d'indices vides
 function getLegalMoves(board) {
     return PREFERRED_ORDER.filter(i => board[i] === EMPTY);
 }
 
-// getWinner(board) -> AI / HUMAN / "draw" / null
 function getWinner(board) {
-    for (var i = 0; i < WIN_LINES.length; i++) {
-        var a = WIN_LINES[i][0];
-        var b = WIN_LINES[i][1];
-        var c = WIN_LINES[i][2];
-        if (board[a] === board[b] && board[b] === board[c] && board[a] !== EMPTY) {
-            if (board[a] === AI) {
-                return AI;
-            } else if (board[a] === HUMAN) {
-                return HUMAN;
-            }
+    for (const [a, b, c] of WIN_LINES) {
+        if (board[a] !== EMPTY && board[a] === board[b] && board[b] === board[c]) {
+            return board[a]; // "X" ou "O"
         }
     }
-    if (getLegalMoves(board).length === 0) {
-        return "draw";
-    } else {
-        return null;
-    }
+    return getLegalMoves(board).length === 0 ? "draw" : null;
 }
 
-// applyMove(board, index, player) -> nouveau board
 function applyMove(board, index, player) {
-    var new_board = board.slice();
-    new_board[index] = player;
-    return new_board;
+    const next = board.slice();
+    next[index] = player;
+    return next;
 }
+
+// ── Minimax avec alpha-beta ───────────────────────────────────
+
+let nodesVisited = 0;
 
 function minimax(board, player, alpha, beta) {
     nodesVisited++;
     const winner = getWinner(board);
-    if (winner === AI) {
-        return 1;
-    } else if (winner === HUMAN) {
-        return -1;
-    } else if (winner === "draw") {
-        return 0;
-    }
+    if (winner === AI)    return  1;
+    if (winner === HUMAN) return -1;
+    if (winner === "draw") return  0;
+
     if (player === AI) {
-        let bestScore = -Infinity;
-        const moves = getLegalMoves(board);
-        for (let i = 0; i < moves.length; i++) {
-            let new_board = applyMove(board, moves[i], player);
-            let score = minimax(new_board, HUMAN, alpha, beta);
-            bestScore = Math.max(score, bestScore);
-            alpha = Math.max(alpha, bestScore);
+        let best = -Infinity;
+        for (const move of getLegalMoves(board)) {
+            const score = minimax(applyMove(board, move, AI), HUMAN, alpha, beta);
+            best  = Math.max(best, score);
+            alpha = Math.max(alpha, best);
             if (alpha >= beta) break;
         }
-        return bestScore;
-    } else if (player === HUMAN) {
-        let bestScore = Infinity;
-        const moves = getLegalMoves(board);
-        for (let i = 0; i < moves.length; i++) {
-            let new_board = applyMove(board, moves[i], player);
-            let score = minimax(new_board, AI, alpha, beta);
-            bestScore = Math.min(score, bestScore);
-            beta = Math.min(beta, bestScore);
+        return best;
+    } else {
+        let best = Infinity;
+        for (const move of getLegalMoves(board)) {
+            const score = minimax(applyMove(board, move, HUMAN), AI, alpha, beta);
+            best = Math.min(best, score);
+            beta = Math.min(beta, best);
             if (alpha >= beta) break;
         }
-        return bestScore;
-        }
+        return best;
+    }
 }
 
 function chooseBestMove(board) {
     let bestScore = -Infinity;
     let bestMove;
-    const moves = getLegalMoves(board);
-    for (let i = 0; i < moves.length; i++) {
-        let new_board = applyMove(board, moves[i], AI);
-        let score = minimax(new_board, HUMAN, -Infinity, Infinity);
-        if (score > bestScore) {
-            bestScore = score;
-            bestMove = moves[i];
-        }
+    for (const move of getLegalMoves(board)) {
+        const score = minimax(applyMove(board, move, AI), HUMAN, -Infinity, Infinity);
+        if (score > bestScore) { bestScore = score; bestMove = move; }
     }
     return bestMove;
 }
 
 function getRandomMove(board) {
-    const legal_moves = getLegalMoves(board);
-    return legal_moves[Math.floor(Math.random() * legal_moves.length)];
+    const moves = getLegalMoves(board);
+    return moves[Math.floor(Math.random() * moves.length)];
 }
 
 function getAiMove(board, mode) {
     nodesVisited = 0;
-    if (mode == "easy") {
-        return getRandomMove(board);
-    } else {
-        return chooseBestMove(board);
-    }
+    return mode === "easy" ? getRandomMove(board) : chooseBestMove(board);
 }
 
-// ===== UI / GAME STATE =====
-let board = createBoard();
-let mode = "perfect";
-let gameOver = false;
-let aiThinking = false;
+// ── État du jeu ───────────────────────────────────────────────
 
-const gridEl = document.getElementById("grid");
-const statusEl = document.getElementById("status");
-const modeEl = document.getElementById("mode");
-const resetEl = document.getElementById("reset");
-const aiTimeEl = document.getElementById("aiTime");
+let board         = createBoard();
+let mode          = "perfect";
+let gameOver      = false;
+let aiThinking    = false;
+let startingPlayer = HUMAN;
 
-let nodesVisited = 0;
-const aiNodesEl = document.getElementById("aiNodes");
+// ── Éléments DOM ─────────────────────────────────────────────
 
-let startingPlayer = HUMAN; // HUMAN ou AI
+const gridEl    = document.getElementById("grid");
+const statusEl  = document.getElementById("status");
+const modeEl    = document.getElementById("mode");
+const resetEl   = document.getElementById("reset");
 const starterEl = document.getElementById("starter");
-starterEl.addEventListener("change", () => {
-    startingPlayer = starterEl.value;
-    resetGame();
-});
-
+const aiTimeEl  = document.getElementById("aiTime");
+const aiNodesEl = document.getElementById("aiNodes");
 const themeToggleEl = document.getElementById("themeToggle");
+
+// ── Thème ─────────────────────────────────────────────────────
 
 function setTheme(theme) {
     document.documentElement.dataset.theme = theme;
@@ -147,7 +120,8 @@ themeToggleEl.addEventListener("change", () => {
     setTheme(themeToggleEl.checked ? "dark" : "light");
 });
 
-// Construire les 9 cases (boutons)
+// ── Rendu ─────────────────────────────────────────────────────
+
 function initGrid() {
     gridEl.innerHTML = "";
     for (let i = 0; i < 9; i++) {
@@ -163,7 +137,7 @@ function setStatus(text) {
     statusEl.textContent = text;
 }
 
-function clearWinHighLight() {
+function clearWinHighlight() {
     for (const el of gridEl.children) el.classList.remove("win");
 }
 
@@ -179,10 +153,17 @@ function getWinningLine(board) {
 function render() {
     const cells = gridEl.children;
     for (let i = 0; i < 9; i++) {
-        cells[i].textContent = board[i] === EMPTY ? "" : board[i];
-        cells[i].disabled = gameOver || aiThinking || board[i] !== EMPTY;
+        const cell = cells[i];
+        const val  = board[i];
+        cell.textContent = val === EMPTY ? "" : val;
+        cell.dataset.player = val === EMPTY ? "" : val; // pour CSS couleurs
+        cell.disabled = gameOver || aiThinking || val !== EMPTY;
     }
+    // Classe visuelle "IA réfléchit"
+    gridEl.classList.toggle("thinking", aiThinking && !gameOver);
 }
+
+// ── Fin de partie ─────────────────────────────────────────────
 
 function endGame(winner) {
     gameOver = true;
@@ -192,87 +173,92 @@ function endGame(winner) {
         for (const idx of line) gridEl.children[idx].classList.add("win");
     }
 
-    if (winner === "draw") setStatus("Match nul. Humanité : 0, logique : 0.");
-    else setStatus(`${winner} gagne.`);
+    if (winner === "draw") {
+        setStatus("Match nul — l'IA a quand même failli s'ennuyer.");
+    } else if (winner === AI) {
+        setStatus("L'IA gagne. Comme prévu.");
+    } else {
+        setStatus("Tu as gagné ? Mode facile détecté.");
+    }
+
+    render();
 }
 
 function checkGameState() {
     const w = getWinner(board);
-    if (w === null) return null;
+    if (w === null) return false;
     endGame(w);
-    return w;
+    return true;
 }
+
+// ── Interactions ──────────────────────────────────────────────
 
 function onCellClick(e) {
     if (gameOver || aiThinking) return;
-
     const idx = Number(e.currentTarget.dataset.index);
     if (board[idx] !== EMPTY) return;
 
-    clearWinHighLight();
-
-    //Coup humain
+    clearWinHighlight();
     board = applyMove(board, idx, HUMAN);
     render();
 
     if (checkGameState()) return;
-
-    //Tour IA avec micro-délai
     aiTurn();
 }
 
 function aiTurn() {
     aiThinking = true;
-    setStatus("L'IA réfléchit...");
+    setStatus("L'IA réfléchit…");
     render();
 
-    const delayMs = 120; // micro délai UX
-
     setTimeout(() => {
-        const t0 = performance.now();
+        const t0   = performance.now();
         const move = getAiMove(board, mode);
-        const t1 = performance.now();
+        const t1   = performance.now();
 
         aiNodesEl.textContent = String(nodesVisited);
-
-        aiTimeEl.textContent = (t1 - t0).toFixed(2);
+        aiTimeEl.textContent  = (t1 - t0).toFixed(2);
 
         board = applyMove(board, move, AI);
-
         aiThinking = false;
         render();
 
         if (!checkGameState()) {
-            setStatus(`A toi de jouer (${HUMAN}).`);
+            setStatus("À toi de jouer (O).");
         }
-    }, delayMs);
+    }, 120);
 }
 
 function resetGame() {
-    board = createBoard();
-    gameOver = false;
+    board      = createBoard();
+    gameOver   = false;
     aiThinking = false;
     nodesVisited = 0;
-    aiTimeEl.textContent = "-";
-    aiNodesEl.textContent = "-";
-    clearWinHighLight();
+    aiTimeEl.textContent  = "—";
+    aiNodesEl.textContent = "—";
+    clearWinHighlight();
     render();
 
     if (startingPlayer === AI) {
-        setStatus("L'IA commence...");
+        setStatus("L'IA ouvre le jeu…");
         aiTurn();
     } else {
-        setStatus(`A toi de jouer (${HUMAN}).`);
+        setStatus("À toi de jouer (O).");
     }
 }
 
-// Events UI
-modeEl.addEventListener("change", () => {
-    mode = modeEl.value;
+// ── Événements UI ─────────────────────────────────────────────
+
+modeEl.addEventListener("change", () => { mode = modeEl.value; });
+
+starterEl.addEventListener("change", () => {
+    startingPlayer = starterEl.value;
+    resetGame();
 });
 
 resetEl.addEventListener("click", resetGame);
 
-// Boot
+// ── Boot ──────────────────────────────────────────────────────
+
 initGrid();
 resetGame();

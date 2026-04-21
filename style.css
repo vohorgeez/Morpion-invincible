@@ -1,77 +1,245 @@
+/* ── Police ─────────────────────────────────────────────────── */
+
 @font-face {
     font-family: "Vividly";
-    src: url(".assets/fonts/Vividly-Regular.ttf") format("truetype"),
-    url("./assets/fonts/Vividly-Regular.otf") format("opentype");
+    src: url("./assets/fonts/Vividly-Regular.ttf") format("truetype"),
+         url("./assets/fonts/Vividly-Regular.otf") format("opentype");
     font-weight: 400;
     font-style: normal;
     font-display: swap;
 }
 
-* { box-sizing: border-box;}
-.app { width: min(520px, 100%); display: grid; gap: 16px; }
-.controls { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+/* ── Variables de thème ─────────────────────────────────────── */
+
+:root {
+    --bg:       #f9f8f5;
+    --fg:       #111111;
+    --muted:    #f0efe9;
+    --border:   #d8d5cc;
+    --cell-bg:  #ffffff;
+    --cell-fg:  #111111;
+
+    --x-color:  #1a6ef5;   /* X → bleu */
+    --o-color:  #e03a2f;   /* O → rouge */
+    --win-glow: #f5c400;   /* ligne gagnante → or */
+
+    --radius-cell: 14px;
+    --radius-ui:   8px;
+}
+
+html[data-theme="dark"] {
+    --bg:      #0f1115;
+    --fg:      #eaeaea;
+    --muted:   #151923;
+    --border:  #2a2f3a;
+    --cell-bg: #121622;
+    --cell-fg: #eaeaea;
+}
+
+/* ── Reset minimal ──────────────────────────────────────────── */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; }
+
+/* ── Layout global ──────────────────────────────────────────── */
+
+body {
+    font-family: system-ui, sans-serif;
+    font-size: 15px;
+    padding: 28px 20px;
+    min-height: 100dvh;
+    display: grid;
+    place-items: start center;
+    background: var(--bg);
+    color: var(--fg);
+    transition: background 0.25s, color 0.25s;
+}
+
+.app {
+    width: min(480px, 100%);
+    display: grid;
+    gap: 18px;
+}
+
+h1 {
+    font-family: "Vividly", system-ui, sans-serif;
+    font-size: clamp(1.8rem, 5vw, 2.6rem);
+    letter-spacing: 0.5px;
+    font-weight: 400;
+}
+
+/* ── Contrôles ──────────────────────────────────────────────── */
+
+.controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.controls label {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    font-size: 12px;
+    color: color-mix(in srgb, var(--fg) 60%, transparent);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+select {
+    font: inherit;
+    font-size: 14px;
+    padding: 6px 8px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-ui);
+    background: var(--cell-bg);
+    color: var(--fg);
+    cursor: pointer;
+}
+
+#reset {
+    font: inherit;
+    font-size: 14px;
+    padding: 6px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-ui);
+    background: var(--cell-bg);
+    color: var(--fg);
+    cursor: pointer;
+    align-self: flex-end;
+    transition: background 0.15s, transform 0.1s;
+}
+
+#reset:hover  { background: var(--muted); }
+#reset:active { transform: scale(0.96); }
+
+/* ── Stats ──────────────────────────────────────────────────── */
+
+.stats {
+    display: flex;
+    gap: 16px;
+    font-size: 13px;
+    color: color-mix(in srgb, var(--fg) 60%, transparent);
+}
+
+.stats strong {
+    color: var(--fg);
+    font-variant-numeric: tabular-nums;
+}
+
+/* ── Status ─────────────────────────────────────────────────── */
+
+.status {
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-ui);
+    background: var(--muted);
+    font-size: 14px;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    transition: background 0.2s;
+}
+
+/* ── Grille ─────────────────────────────────────────────────── */
 
 .grid {
     display: grid;
-    grid-template-columns: repeat(3, 110px);
-    grid-template-rows: repeat(3, 110px);
+    grid-template-columns: repeat(3, 1fr);
     gap: 10px;
+    aspect-ratio: 1;
+}
+
+/* Curseur bloqué pendant que l'IA joue */
+.grid.thinking { cursor: wait; }
+
+/* ── Cases ──────────────────────────────────────────────────── */
+
+.cell {
+    font-family: "Vividly", system-ui, sans-serif;
+    font-size: clamp(42px, 10vw, 60px);
+    line-height: 1;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-cell);
+    background: var(--cell-bg);
+    cursor: pointer;
+    color: var(--cell-fg);
+    transition: background 0.12s, transform 0.1s, opacity 0.1s;
+    position: relative;
+    overflow: hidden;
+}
+
+.cell:not(:disabled):hover {
+    background: var(--muted);
+    transform: scale(1.03);
 }
 
 .cell:disabled {
     cursor: not-allowed;
-    opacity: 0.7;
+    opacity: 0.55;
 }
 
-:root {
-    --bg: #ffffff;
-    --fg: #111111;
-    --muted: #fafafa;
-    --border: #dddddd;
-    --cell-bg: #ffffff;
-    --cell-fg: #111111;
-    --outline: #111111;
-}
+/* Couleurs X et O */
+.cell[data-player="X"] { color: var(--x-color); opacity: 1; }
+.cell[data-player="O"] { color: var(--o-color); opacity: 1; }
 
-html[data-theme=dark] {
-    --bg: #0f1115;
-    --fg: #eaeaea;
-    --muted: #151923;
-    --border: #2a2f3a;
-    --cell-bg: #121622;
-    --cell-fg: #eaeaea;
-    --outline: #eaeaea;
-}
+/* ── Ligne gagnante ─────────────────────────────────────────── */
 
-body { 
-    font-family: system-ui, sans-serif; 
-    margin: 0; 
-    padding: 24px; 
-    display: grid; 
-    place-items: start center;
-    background: var(--bg);
-    color: var(--fg);
-}
-
-.status { 
-    padding: 10px 12px; 
-    border: 1px solid var(--border); 
-    border-radius: 10px; 
-    background: var(--muted);
-}
-
-.cell {
-    font-family: "Vividly", system-ui, sans-serif;
-    font-size: 56px;
-    line-height: 1;
-    letter-spacing: 0.5px;
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    background: var(--cell-bg);
-    cursor: pointer;
-    color: var(--cell-fg);
+@keyframes win-pulse {
+    0%   { box-shadow: 0 0 0   0 color-mix(in srgb, var(--win-glow) 60%, transparent); }
+    50%  { box-shadow: 0 0 16px 6px color-mix(in srgb, var(--win-glow) 40%, transparent); }
+    100% { box-shadow: 0 0 0   0 color-mix(in srgb, var(--win-glow) 60%, transparent); }
 }
 
 .cell.win {
-    outline: 4px solid var(--outline); /* ligne gagnante */
+    border-color: var(--win-glow);
+    background: color-mix(in srgb, var(--win-glow) 12%, var(--cell-bg));
+    animation: win-pulse 1.2s ease-in-out infinite;
+    opacity: 1 !important;
+}
+
+/* ── Toggle thème (interrupteur) ────────────────────────────── */
+
+.toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    align-self: flex-end;
+    padding-bottom: 2px; /* alignement optique avec les select */
+}
+
+.toggle input { display: none; }
+
+.toggle-track {
+    display: inline-flex;
+    width: 36px;
+    height: 20px;
+    border-radius: 99px;
+    border: 1px solid var(--border);
+    background: var(--muted);
+    position: relative;
+    transition: background 0.2s;
+}
+
+.toggle-track::after {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--fg);
+    transition: transform 0.2s;
+}
+
+.toggle input:checked + .toggle-track {
+    background: var(--fg);
+}
+
+.toggle input:checked + .toggle-track::after {
+    transform: translateX(16px);
+    background: var(--bg);
 }
