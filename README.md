@@ -1,15 +1,27 @@
 # Morpion invincible
 
-Version 3 - interface web + IA parfaite.
+Version 4 - Polish & Extensions
 
 Petit jeu de morpion (tic-tac-toe) avec une IA invincible en mode parfait, basee sur un minimax exhaustif avec alpha-beta.
 
-## Nouveautes v3
+## Nouveautés v4 (en cours)
+- Move ordering
+- Transposition table
+
+## Nouveautés v3
 - Interface web autonome (HTML/CSS/JS) avec grille cliquable.
 - Deux modes : Facile (aleatoire) et Parfait (minimax).
 - Choix du joueur qui commence (humain ou IA).
 - Statistiques affichees : temps de calcul et noeuds explores.
 - Theme clair/sombre et surlignage de la ligne gagnante.
+
+## Série d'articles
+- [1/6 - Un jeu trivial ?](https://www.mathieuvergez.com/post/morpion-invincible-1-6-un-jeu-trivial)
+- [2/6 - La modélisation du jeu](https://www.mathieuvergezcom/post/morpion-invincible-2-6-la-modélisation-du-jeu)
+- [3/6 - Minimax](https://www.mathieuvergez.com/post/morpion-invincible-3-6-minimax)
+- [4/6 - Alpha-beta](https://www.mathieuvergez.com/post/morpion-invincible-4-6-alpha-beta-ou-comment-l-ia-arrête-de-réfléchir-pour-rien)
+- [5/6 - Du terminal au navigateur](https://www.mathieuvergez.com/post/morpion-invincible-5-6-du-terminal-au-navigateur)
+- 6/6 - *en cours d'écriture*
 
 ## Prerequis
 - Pour le web : un navigateur moderne (aucun serveur requis).
@@ -62,7 +74,3 @@ Les tests valident notamment :
 - l'absence d'heuristique (seules les fins de partie ont une note),
 - que le premier coup optimal est toujours le centre,
 - et que le compteur de noeuds s'incremente pendant la recherche.
-
-## Idees pour la suite
-- Export de statistiques (temps de calcul, histogramme des noeuds) pour analyser les performances.
-- Options de profondeur pour simuler des niveaux de difficulte.
