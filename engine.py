@@ -1,3 +1,5 @@
+import json
+
 WIN_LINES = [
     (0,1,2), (3,4,5), (6,7,8), #lignes
     (0,3,6), (1,4,7), (2,5,8), #colonnes
@@ -6,7 +8,7 @@ WIN_LINES = [
 
 HUMAN = "O"
 AI = "X"
-EMPTY = " "
+EMPTY = "_"
 
 # --- Compteur de noeuds pour le minimax ---
 NODES_VISITED = 0
@@ -83,7 +85,7 @@ def evaluate(board):
     
 # --- Minimax pur ---
 
-def minimax_pure(board, is_maximizing):
+def minimax_pure(board, is_maximizing, cache: dict=None):
     """
     Minimax exhaustif SANS élagage alpha-beta.
     Utilisé uniquement pour comparer les performances avec minimax_ab.
@@ -91,29 +93,38 @@ def minimax_pure(board, is_maximizing):
     global NODES_VISITED
     NODES_VISITED += 1
 
+    if cache is None:
+        cache = {}
+
     if is_terminal(board):
         return evaluate(board)
     
-    legal_moves = get_available_moves(board) # pas d'ordering : comparaison équitable
+    legal_moves = ordered_legal_moves(board)
 
     if is_maximizing:
+        if ''.join(board) + '1' in cache:
+            return cache[''.join(board) + '1']
         value = float("-inf")
         for move in legal_moves:
             board[move] = AI
-            value = max(value, minimax_pure(board, False))
+            value = max(value, minimax_pure(board, False, cache))
             board[move] = EMPTY
+        cache[''.join(board) + '1'] = value
         return value
     else:
+        if ''.join(board) + '0' in cache:
+            return cache[''.join(board) + '0']
         value = float("inf")
         for move in legal_moves:
             board[move] = HUMAN
-            value = min(value, minimax_pure(board, True))
+            value = min(value, minimax_pure(board, True, cache))
             board[move] = EMPTY
+        cache[''.join(board) + '0'] = value
         return value
 
 # --- Minimax avec élagage alpha-beta ---
     
-def minimax_ab(board, is_maximizing, alpha, beta):
+def minimax_ab(board, is_maximizing, alpha, beta, cache: dict):
     """
     Minimax exhaustif avec élagage alpha-beta.
     Pas d'heuristique : on ne note que les positions terminales.
@@ -127,24 +138,30 @@ def minimax_ab(board, is_maximizing, alpha, beta):
     legal_moves = ordered_legal_moves(board)
 
     if is_maximizing:
+        if ''.join(board) + '1' in cache:
+            return cache[''.join(board) + '1']
         value = float("-inf")
         for move in legal_moves:
             board[move] = AI
-            value = max(value, minimax_ab(board, False, alpha, beta))
+            value = max(value, minimax_ab(board, False, alpha, beta, cache))
             board[move] = EMPTY
             alpha = max(alpha, value)
             if beta <= alpha: # le maximiseur a déjà mieux ailleurs : inutile d'explorer cette branche
                 break # élagage
+        cache[''.join(board) + '1'] = value
         return value
     else:
+        if ''.join(board) + '0' in cache:
+            return cache[''.join(board) + '0']
         value = float("inf")
         for move in legal_moves:
             board[move] = HUMAN
-            value = min(value, minimax_ab(board, True, alpha, beta))
+            value = min(value, minimax_ab(board, True, alpha, beta, cache))
             board[move] = EMPTY
             beta = min(beta, value)
             if beta <= alpha: # le minimiseur a déjà mieux ailleurs : inutile d'explorer cette branche
                 break # élagage
+        cache[''.join(board) + '0'] = value
         return value
     
 # Ordre préféré pour les coups (centre > coins > bords)
@@ -163,17 +180,39 @@ def choose_best_move(board):
     legal_moves = ordered_legal_moves(board)
     best_move = legal_moves[0]
     best_score = float("-inf")
+    cache = {}
 
     for move in legal_moves:
         #print(f"Coup analysé : {move}")
         board[move] = AI
-        score = minimax_ab(board, False, float("-inf"), float("inf"))
+        score = minimax_pure(board, False, cache)
         board[move] = EMPTY
         print(f"Score du coup {move} : {score}")
         if score > best_score:
             best_score = score
             best_move = move
     #print(f"Meilleur coup trouvé : {best_move} (score = {best_score})")
+    return best_move
+
+with open("table.json", "r") as json_file:
+        table = json.load(json_file)
+
+def read_best_move(board):
+
+    legal_moves = ordered_legal_moves(board)
+    best_move = legal_moves[0]
+    best_score = float("-inf")
+
+    for move in legal_moves:
+        board[move] = AI
+        if is_terminal(board):
+            score = evaluate(board)
+        else:
+            score = table[''.join(board) + '0']
+        board[move] = EMPTY
+        if best_score < score:
+            best_score = score
+            best_move = move
     return best_move
 
 # --- Petite API pratique ---
@@ -192,7 +231,6 @@ def make_ai_move(board):
     Joue le meilleur coup pour X sur 'board'.
     Retourne (nouveau_plateau, coup_joué, noeuds_explorés).
     """
-    move = choose_best_move(board)
-    nodes = get_node_counter()
+    move = read_best_move(board)
     new_board = apply_move(board, move, AI)
-    return new_board, move, nodes
+    return new_board, move

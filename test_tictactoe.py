@@ -9,7 +9,10 @@ from engine import (
     choose_best_move,
     reset_node_counter,
     get_node_counter,
-    is_valid_move
+    is_valid_move,
+    EMPTY,
+    AI,
+    HUMAN
 )
 
 class TestTicTacToe(unittest.TestCase):
@@ -20,41 +23,41 @@ class TestTicTacToe(unittest.TestCase):
 
     def test_has_won_rows_cols_diags(self):
         # Row
-        board = ["X", "X", "X", " ", " ", " ", " ", " ", " "]
+        board = [AI, AI, AI, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY]
         self.assertTrue(has_won(board, "X"))
 
         # Column
-        board = ["O", " ", " ", "O", " ", " ", "O", " ", " "]
+        board = [HUMAN, EMPTY, EMPTY, HUMAN, EMPTY, EMPTY, HUMAN, EMPTY, EMPTY]
         self.assertTrue(has_won(board, "O"))
 
         # Diagonal
-        board = ["X", " ", " ",
-                 " ", "X", " ",
-                 " ", " ", "X"]
-        self.assertTrue(has_won(board, "X"))
+        board = [AI, EMPTY, EMPTY,
+                 EMPTY, AI, EMPTY,
+                 EMPTY, EMPTY, AI]
+        self.assertTrue(has_won(board, AI))
 
     def test_get_winner_and_evaluate(self):
         # X wins
-        board = ["X", "X", "X", "O", "O", " ", " ", " ", " "]
+        board = [AI, AI, AI, HUMAN, HUMAN, EMPTY, EMPTY, EMPTY, EMPTY]
         self.assertEqual(get_winner(board), "X")
         self.assertEqual(evaluate(board), 1)
 
         # O wins
-        board = ["O", "O", "O", "X", "X", " ", " ", " ", " "]
+        board = [HUMAN, HUMAN, HUMAN, AI, AI, EMPTY, EMPTY, EMPTY, EMPTY]
         self.assertEqual(get_winner(board), "O")
         self.assertEqual(evaluate(board), -1)
 
         # Draw
-        board = ["X", "O", "X",
-                 "X", "O", "O",
-                 "O", "X", "X"]
+        board = [AI, HUMAN, AI,
+                 AI, HUMAN, HUMAN,
+                 HUMAN, AI, AI]
         self.assertEqual(get_winner(board), "draw")
         self.assertEqual(evaluate(board), 0)
 
         # Non-terminal
-        board = ["X", "O", "X",
-                 " ", "O", " ",
-                 " ", "X", " "]
+        board = [AI, HUMAN, AI,
+                 EMPTY, HUMAN, EMPTY,
+                 EMPTY, AI, EMPTY]
         self.assertIsNone(get_winner(board))
         self.assertIsNone(evaluate(board))
 

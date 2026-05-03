@@ -55,9 +55,8 @@ def play_game():
     ai_starts = ask_who_starts()
     
     if ai_starts:
-        board, move, nodes = make_ai_move(board)
+        board, move = make_ai_move(board)
         print(f"[IA] joue en {move}")
-        print(f"[IA] Noeuds explorés : {nodes}")
 
     while get_winner(board) is None:
         human_turn(board)
@@ -65,9 +64,8 @@ def play_game():
         if winner is not None:
             break
 
-        board, move, nodes = make_ai_move(board)
+        board, move, = make_ai_move(board)
         print(f"[IA] joue en {move}")
-        print(f"[IA] Noeuds explorés : {nodes}")
 
     print_board(board)
     winner = get_winner(board)
