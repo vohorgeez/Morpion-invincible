@@ -10,6 +10,8 @@ from engine import (
     reset_node_counter,
     get_node_counter,
     is_valid_move,
+    read_best_move,
+    make_ai_move,
     EMPTY,
     AI,
     HUMAN
@@ -80,6 +82,37 @@ class TestTicTacToe(unittest.TestCase):
         board = create_board()
         board[0] = "X"
         self.assertFalse(is_valid_move(board, 0))
+
+    def test_read_best_move_starting_game(self):
+        board = create_board()
+        self.assertEqual(read_best_move(board), 4)
+
+    def test_read_best_move_prevents_human_win(self):
+        board = [EMPTY, HUMAN, AI,
+                 AI, HUMAN, EMPTY,
+                 EMPTY, EMPTY, EMPTY]
+        self.assertEqual(read_best_move(board), 7)
+
+    def test_read_best_move_wants_to_win(self):
+        board = [AI, HUMAN, EMPTY,
+                 HUMAN, AI, EMPTY,
+                 AI, EMPTY, HUMAN]
+        self.assertEqual(read_best_move(board), 2)
+
+    def test_read_best_move_fills_the_board(self):
+        board = [HUMAN, AI, HUMAN,
+                 AI, HUMAN, EMPTY,
+                 AI, HUMAN, AI]
+        self.assertEqual(read_best_move(board), 5)
+
+    def test_make_ai_move_returns_a_new_board_and_a_move(self):
+        board = create_board()
+        new_board, move = make_ai_move(board)
+        self.assertTrue(new_board != board)
+        self.assertEqual(new_board, [EMPTY, EMPTY, EMPTY,
+                                    EMPTY, AI, EMPTY,
+                                    EMPTY, EMPTY, EMPTY])
+        self.assertEqual(move, 4)
 
 if __name__ == "__main__":
     unittest.main()

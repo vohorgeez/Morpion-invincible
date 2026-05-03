@@ -173,7 +173,7 @@ def ordered_legal_moves(board):
 
 def choose_best_move(board):
     """
-    Choisit le meilleur coup pour X avec minimax + alpha-beta.
+    Choisit le meilleur coup pour X avec minimax.
     Centre / coins sont testés en priorité pour optimiser l'élagage et garantir un premier coup "propre" (centre).
     """
     reset_node_counter()
@@ -187,7 +187,7 @@ def choose_best_move(board):
         board[move] = AI
         score = minimax_pure(board, False, cache)
         board[move] = EMPTY
-        print(f"Score du coup {move} : {score}")
+        #print(f"Score du coup {move} : {score}")
         if score > best_score:
             best_score = score
             best_move = move
@@ -229,7 +229,7 @@ def apply_move(board, index, player):
 def make_ai_move(board):
     """
     Joue le meilleur coup pour X sur 'board'.
-    Retourne (nouveau_plateau, coup_joué, noeuds_explorés).
+    Retourne (nouveau_plateau, coup_joué).
     """
     move = read_best_move(board)
     new_board = apply_move(board, move, AI)

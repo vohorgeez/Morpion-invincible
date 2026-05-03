@@ -64,7 +64,7 @@ def play_game():
         if winner is not None:
             break
 
-        board, move, = make_ai_move(board)
+        board, move = make_ai_move(board)
         print(f"[IA] joue en {move}")
 
     print_board(board)
