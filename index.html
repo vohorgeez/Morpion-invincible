@@ -13,10 +13,8 @@
       <div class="controls">
         <label>
           Difficulté
-          <select id="mode">
-            <option value="easy">Facile (aléatoire)</option>
-            <option value="perfect" selected>Parfait (minimax)</option>
-          </select>
+          <input type="range" id="difficulty" name="difficulty" min="0" max="10" />
+          <p>Niveau : <output id="difflevel"></output></p>
         </label>
 
         <label>

@@ -81,15 +81,20 @@ function getRandomMove(board) {
     return moves[Math.floor(Math.random() * moves.length)];
 }
 
-function getAiMove(board, mode) {
+function getAiMove(board, difficulty) {
     nodesVisited = 0;
-    return mode === "easy" ? getRandomMove(board) : chooseBestMove(board);
+    let tirage = Math.random() * 10;
+    if (difficulty > tirage) {
+        return chooseBestMove(board);
+    } else {
+        return getRandomMove(board);
+    }
 }
 
 // ── État du jeu ───────────────────────────────────────────────
 
 let board         = createBoard();
-let mode          = "perfect";
+let difficulty    = 5;
 let gameOver      = false;
 let aiThinking    = false;
 let startingPlayer = HUMAN;
@@ -98,12 +103,14 @@ let startingPlayer = HUMAN;
 
 const gridEl    = document.getElementById("grid");
 const statusEl  = document.getElementById("status");
-const modeEl    = document.getElementById("mode");
+const difficultyEl = document.getElementById("difficulty");
 const resetEl   = document.getElementById("reset");
 const starterEl = document.getElementById("starter");
 const aiTimeEl  = document.getElementById("aiTime");
 const aiNodesEl = document.getElementById("aiNodes");
 const themeToggleEl = document.getElementById("themeToggle");
+const levelEl = document.getElementById("difflevel");
+levelEl.textContent = difficultyEl.value;
 
 // ── Thème ─────────────────────────────────────────────────────
 
@@ -213,7 +220,7 @@ function aiTurn() {
 
     setTimeout(() => {
         const t0   = performance.now();
-        const move = getAiMove(board, mode);
+        const move = getAiMove(board, difficulty);
         const t1   = performance.now();
 
         aiNodesEl.textContent = String(nodesVisited);
@@ -249,7 +256,10 @@ function resetGame() {
 
 // ── Événements UI ─────────────────────────────────────────────
 
-modeEl.addEventListener("change", () => { mode = modeEl.value; });
+difficultyEl.addEventListener("change", () => { 
+    difficulty = parseInt(difficultyEl.value);
+    levelEl.textContent = difficultyEl.value;
+ });
 
 starterEl.addEventListener("change", () => {
     startingPlayer = starterEl.value;
