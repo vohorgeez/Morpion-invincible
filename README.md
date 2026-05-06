@@ -4,9 +4,15 @@ Version 4 - Polish & Extensions
 
 Petit jeu de morpion (tic-tac-toe) avec une IA invincible en mode parfait, basee sur un minimax exhaustif avec alpha-beta.
 
-## Nouveautés v4 (en cours)
-- Move ordering
-- Transposition table
+## Nouveautés v4
+
+### Version Python/CLI :
+
+Génération d'un tableau des coups JSON via `generate_table.py` contenant toutes les positions du morpion et leur résolution optimale. Le jeu ne calcule plus, il se contente de piocher dans le tableau.
+
+### Version JavaScript/web
+
+Ajout d'une barre de réglage de la difficulté, permettant une alternance de l'IA entre minimax et de l'aléatoire, sur la base de probabilités.
 
 ## Nouveautés v3
 - Interface web autonome (HTML/CSS/JS) avec grille cliquable.
