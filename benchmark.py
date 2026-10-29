@@ -28,9 +28,10 @@ def best_move_ab(board):
     reset_node_counter()
     best_score = float("-inf")
     best = ordered_legal_moves(board)[0]
+    cache = {}
     for move in ordered_legal_moves(board):
         board[move] = AI
-        score = minimax_ab(board, False, float("-inf"), float("inf"))
+        score = minimax_ab(board, False, float("-inf"), float("inf"), cache)
         board[move] = EMPTY
         if score > best_score:
             best_score = score
